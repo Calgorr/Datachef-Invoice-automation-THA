@@ -4,10 +4,18 @@ from config import DESTINATION_BUCKET_NAME
 import re
 from notify_slack import post_message_to_slack
 
-s3_client = boto3.client("s3")
+
+class S3ClientSingleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = boto3.client("s3")
+        return cls._instance
 
 
 def lambda_handler(event, context):
+    s3_client = S3ClientSingleton()
     username, source_bucket, file_key = extract_info_from_event(event)
     if not file_type_validated(file_key) or not file_name_validated(file_key):
         slack_message = f"File {file_key} is not a valid invoice file."
