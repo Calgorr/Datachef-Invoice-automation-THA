@@ -1,8 +1,8 @@
 import json
 import boto3
-from config import DESTINATION_BUCKET_NAME
 import re
 from notify_slack import post_message_to_slack
+from config.config import DESTINATION_BUCKET_NAME
 
 
 class S3ClientSingleton:
@@ -17,7 +17,7 @@ class S3ClientSingleton:
 def lambda_handler(event, context):
     s3_client = S3ClientSingleton()
     username, source_bucket, file_key = extract_info_from_event(event)
-    if not file_type_validated(file_key) or not file_name_validated(file_key):
+    if not file_type_validated(file_key) or not file_name_validated(file_key[:-4]):
         slack_message = f"File {file_key} is not a valid invoice file."
         post_message_to_slack(slack_message)
         return {
@@ -26,9 +26,9 @@ def lambda_handler(event, context):
         }
     try:
         s3_client.copy_object(
-            {"Bucket": source_bucket, "Key": file_key},
-            DESTINATION_BUCKET_NAME,
-            username + "/" + file_key,
+            CopySource={"Bucket": source_bucket, "Key": file_key},
+            Bucket=DESTINATION_BUCKET_NAME,
+            Key=username + "/" + file_key,
         )
         print(f"File {file_key} copied to {DESTINATION_BUCKET_NAME} successfully.")
     except Exception as e:
