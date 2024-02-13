@@ -1,0 +1,26 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "transfer:CreateUser",
+        "transfer:DeleteUser",
+        "transfer:UpdateUser",
+        "transfer:UpdateAccess",
+        "transfer:DeleteSshPublicKey"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::dc-tha5-source-bucket",
+        "arn:aws:s3:::dc-tha5-source-bucket/*",
+        "arn:aws:s3:::dc-tha5-destination-bucket",
+        "arn:aws:s3:::dc-tha5-destination-bucket/*"
+      ]
+    }
+  ]
+}
