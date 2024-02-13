@@ -5,7 +5,6 @@ dynamodb = boto3.client("dynamodb")
 transfer = boto3.client("transfer")
 dynamodb_table_name = "SFTPUsers"
 sftp_server_id = sys.argv[1]
-print(f"Server ID: {sftp_server_id}")
 
 
 def get_users_from_dynamodb():
