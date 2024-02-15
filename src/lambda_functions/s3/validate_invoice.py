@@ -36,6 +36,7 @@ def lambda_handler(event, context):
         print(e)
         slack_message = f"Error processing file {file_key}: {str(e)}"
         post_message_to_slack(slack_message)
+        s3_client.delete_object(Bucket=source_bucket, Key=file_key)
 
     return {
         "statusCode": 200,
