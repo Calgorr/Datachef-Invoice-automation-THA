@@ -20,6 +20,7 @@ def lambda_handler(event, context):
     if not file_type_validated(file_key) or not file_name_validated(file_key[:-4]):
         slack_message = f"File {file_key} is not a valid invoice file."
         post_message_to_slack(slack_message)
+        s3_client.delete_object(Bucket=source_bucket, Key=file_key)
         return {
             "statusCode": 200,
             "body": json.dumps("Lambda function execution completed."),
@@ -44,7 +45,7 @@ def lambda_handler(event, context):
 
 def extract_info_from_event(event):
     return (
-        event["Records"][0]["userIdentity"]["principalId"],
+        event["Records"][0]["userIdentity"]["principalId"].split(":")[1].split(".")[0],
         event["Records"][0]["s3"]["bucket"]["name"],
         event["Records"][0]["s3"]["object"]["key"],
     )
