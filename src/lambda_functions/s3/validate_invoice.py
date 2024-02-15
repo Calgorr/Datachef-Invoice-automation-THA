@@ -45,7 +45,7 @@ def lambda_handler(event, context):
 
 def extract_info_from_event(event):
     return (
-        event["Records"][0]["userIdentity"]["principalId"].split(":")[1].split(".")[0],
+        event["Records"][0]["userIdentity"]["principalId"].split(":")[2].split(".")[0],
         event["Records"][0]["s3"]["bucket"]["name"],
         event["Records"][0]["s3"]["object"]["key"],
     )
