@@ -72,6 +72,7 @@ Resources:
                   Action:
                     - "s3:GetObject"
                     - "s3:GetObjectVersion"
+                    - "s3:DeleteObject"
                   Resource: "arn:aws:s3:::dc-tha5-source-bucket/*"
                 - Sid: "Statement2"
                   Effect: "Allow"
