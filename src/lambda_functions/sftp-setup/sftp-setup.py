@@ -43,9 +43,9 @@ def create_sftp_user(server_id):
         transfer.create_user(
             ServerId=server_id,
             UserName="admin-sftp",
-            Role=IAM_ROLE_ARN,
+            Role=ADMIN_IAM_ROLE_ARN,
             SshPublicKeyBody=SSH_PUBLIC_KEY,
-            HomeDirectory=HOME_DIRECTORY,
+            HomeDirectory=ADMIN_HOME_DIRECTORY,
         )
         print("SFTP user created successfully.")
     except Exception as e:
@@ -69,9 +69,9 @@ def create_sftp_users(users, server_id):
             transfer.create_user(
                 ServerId=server_id,
                 UserName=username,
-                Role=IAM_ROLE_ARN,
+                Role=EMPLOYEE_IAM_ROLE_ARN,
                 SshPublicKeyBody=ssh_public_key,
-                HomeDirectory=HOME_DIRECTORY,
+                HomeDirectory=EMPLOYEE_HOME_DIRECTORY,
             )
             print(f"SFTP user {username} created successfully.")
         except Exception as e:
