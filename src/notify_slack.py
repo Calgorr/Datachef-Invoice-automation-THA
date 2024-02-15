@@ -1,6 +1,6 @@
 import json
 import urllib.request
-from config.config import SLACK_WEBHOOK_URL
+from config.lambda_config import SLACK_WEBHOOK_URL
 
 
 def post_message_to_slack(text, webhook_url=SLACK_WEBHOOK_URL):
