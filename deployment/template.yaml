@@ -228,7 +228,9 @@ Resources:
                     Resource: "arn:aws:dynamodb:eu-west-1:212435474521:table/SFTPUsers"
                   - Effect: "Allow"
                     Action: "iam:PassRole"
-                    Resource: "arn:aws:iam::212435474521:role/sftp-admin-role"
+                    Resource:
+                      - "arn:aws:iam::212435474521:role/sftp-admin-role"
+                      - "arn:aws:iam::212435474521:role/sftp-employee-s3-management-role"
                     Condition:
                       StringEquals:
                         "iam:PassedToService": "transfer.amazonaws.com"
