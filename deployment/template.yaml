@@ -1,0 +1,341 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation template for the automation of the deployment of THA"
+
+
+Resources:
+##########################################################################
+#  Dynamo DB tables                                                      #
+##########################################################################
+    SFTPTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Delete
+      Properties:
+        KeySchema:
+          - AttributeName: Username
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: Username
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        TableName: SFTPUsers
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+##########################################################################
+#  S3 Bucket for SFTP Server                                             #
+##########################################################################
+    SFTPSourceBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: "dc-tha5-source-bucket"
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+    SFTPDestinationBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: "dc-tha5-destination-bucket"
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+##########################################################################
+#  IAM Roles and Permission                                              #
+##########################################################################
+    S3CopyLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: s3-copy-lambda-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "lambda.amazonaws.com"
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: s3-copy-lambda-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Sid: "Statement1"
+                  Effect: "Allow"
+                  Action:
+                    - "s3:GetObject"
+                    - "s3:GetObjectVersion"
+                  Resource: "arn:aws:s3:::dc-tha5-source-bucket/*"
+                - Sid: "Statement2"
+                  Effect: "Allow"
+                  Action:
+                  - "s3:PutObject"
+                  - "s3:PutObjectAcl"
+                  Resource: "arn:aws:s3:::dc-tha5-destination-bucket/*"
+                - Sid: "Statement3"
+                  Effect: "Allow"
+                  Action: "s3:ListBucket"
+                  Resource:
+                    - "arn:aws:s3:::dc-tha5-source-bucket"
+                    - "arn:aws:s3:::dc-tha5-destination-bucket"
+          - PolicyName: AWSXRayDaemonWriteAccess
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Sid: "AWSXRayDaemonWriteAccess"
+                  Effect: "Allow"
+                  Action:
+                    - "xray:PutTraceSegments"
+                    - "xray:PutTelemetryRecords"
+                    - "xray:GetSamplingRules"
+                    - "xray:GetSamplingTargets"
+                    - "xray:GetSamplingStatisticSummaries"
+                  Resource: "*"
+          - PolicyName: AWSLambdaBasicExecutionRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "logs:CreateLogGroup"
+                    - "logs:CreateLogStream"
+                    - "logs:PutLogEvents"
+                  Resource: "*"
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+    SFTPAdminRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: sftp-admin-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "transfer.amazonaws.com"
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: sftp-admin-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "transfer:CreateUser"
+                    - "transfer:DeleteUser"
+                    - "transfer:UpdateUser"
+                    - "transfer:UpdateAccess"
+                    - "transfer:DeleteSshPublicKey"
+                  Resource: "*"
+                - Effect: "Allow"
+                  Action: "s3:*"
+                  Resource:
+                    - "arn:aws:s3:::dc-tha5-source-bucket"
+                    - "arn:aws:s3:::dc-tha5-source-bucket/*"
+                    - "arn:aws:s3:::dc-tha5-destination-bucket"
+                    - "arn:aws:s3:::dc-tha5-destination-bucket/*"
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"                    
+    EventBridgeSchedulerLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: Amazon_EventBridge_Scheduler_LAMBDA_5d93c3bca3
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "scheduler.amazonaws.com"
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: Amazon-EventBridge-Scheduler-Execution-Policy-71938b90-488c-4f42-9e3d-25c447d1954d
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action: "lambda:InvokeFunction"
+                  Resource:
+                    - "arn:aws:lambda:eu-west-1:212435474521:function:sftp-server-setup:*"
+                    - "arn:aws:lambda:eu-west-1:212435474521:function:sftp-server-setup"
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+    SFTPEmployeeS3ManagementRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: sftp-employee-s3-management-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "transfer.amazonaws.com"
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: sftp-employee-s3-management-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Sid: "Statement1"
+                  Effect: "Allow"
+                  Action:
+                    - "s3:PutObject"
+                    - "s3:ListBucket"
+                  Resource:
+                    - "arn:aws:s3:::dc-tha5-source-bucket"
+                    - "arn:aws:s3:::dc-tha5-source-bucket/*"
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+    SFTPServerLambdaRole:
+        Type: AWS::IAM::Role
+        Properties:
+          RoleName: sftp-server-lambda-role
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Principal:
+                  Service: "lambda.amazonaws.com"
+                Action: "sts:AssumeRole"
+          Policies:
+            - PolicyName: sftp-setup-lambda-policy
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Effect: "Allow"
+                    Action:
+                      - "transfer:CreateServer"
+                      - "transfer:CreateUser"
+                      - "transfer:DescribeServer"
+                      - "transfer:ListServers"
+                      - "transfer:TagResource"
+                    Resource: "*"
+                  - Effect: "Allow"
+                    Action:
+                      - "dynamodb:Scan"
+                      - "dynamodb:GetItem"
+                      - "dynamodb:Query"
+                    Resource: "arn:aws:dynamodb:eu-west-1:212435474521:table/SFTPUsers"
+                  - Effect: "Allow"
+                    Action: "iam:PassRole"
+                    Resource: "arn:aws:iam::212435474521:role/sftp-admin-role"
+                    Condition:
+                      StringEquals:
+                        "iam:PassedToService": "transfer.amazonaws.com"
+            - PolicyName: AWSXRayDaemonWriteAccess
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Sid: "AWSXRayDaemonWriteAccess"
+                    Effect: "Allow"
+                    Action:
+                      - "xray:PutTraceSegments"
+                      - "xray:PutTelemetryRecords"
+                      - "xray:GetSamplingRules"
+                      - "xray:GetSamplingTargets"
+                      - "xray:GetSamplingStatisticSummaries"
+                    Resource: "*"
+            - PolicyName: AWSLambdaBasicExecutionRole
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  - Effect: "Allow"
+                    Action:
+                      - "logs:CreateLogGroup"
+                      - "logs:CreateLogStream"
+                      - "logs:PutLogEvents"
+                    Resource: "*"
+          Tags:
+           - Key: owner
+             Value: "ahomayoni3@gmail.com"
+##########################################################################
+# Lambda functions                                                       #
+##########################################################################
+    S3BucketInvoiceCopy:
+      Type: AWS::Lambda::Function
+      Properties:
+        FunctionName: "s3bucketinvoicecopy"
+        Handler: "lambda_function.lambda_handler"
+        Role: !GetAtt S3CopyLambdaRole.Arn
+        Code:
+          S3Bucket: "dc-tha5-lambda-functions-code"
+          S3Key: "s3-bucket-invoice-copy-43779157-4e18-48e3-8435-036b332e6621.zip"
+        Runtime: python3.12
+        MemorySize: 128
+        Timeout: 3
+        Environment:
+          Variables:
+            destination_bucket_name: "dc-tha5-destination-bucket"
+            slack_webhook_url: "https://hooks.slack.com/services/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"
+            source_bucket_name: "dc-tha5-source-bucket"
+        Tags:
+          owner: "ahomayoni3@gmail.com"
+    SFTPServerSetup:
+      Type: AWS::Lambda::Function
+      Properties:
+        FunctionName: "sftp-server-setup"
+        Handler: "lambda_function.lambda_handler"
+        Role: !GetAtt SFTPServerLambdaRole.Arn
+        Code:
+          S3Bucket: "dc-tha5-lambda-functions-code"
+          S3Key: "sftp-server-setup-c7edb0ab-1ff8-427b-a0a6-e0dd32c70fff.zip"
+        Runtime: python3.12
+        MemorySize: 128
+        Timeout: 3
+        Environment:
+          Variables:
+            dynamodb_table_name: SFTPUsers
+            home_directory: /dc-tha5-destination-bucket
+            iam_role_arn: arn:aws:iam::212435474521:role/sftp-admin-role
+            owner_email_address: ahomayoni3@gmail.com
+            ssh_public_key: >-
+              ssh-rsa
+              AAAAB3NzaC1yc2EAAAADAQABAAABgQDkBo/p2neDK6+Rl7vRP+qj/RCk0/VW40edokm79PNCSYSpAurHEMoGixBkTkGCKqr5GVSdrDzZd6t8Mm+N06WbG/s4q0O72N3K+KpgDKWN8zvZRQugpFb+BjBYqKe5ZSIXbOkUF5XoT8qjbFHawt8lqe88BKUqTTFpfTetJlDmTkW4OP074uRYPcOY2BvbJPu2AJeHUT4vq/Z7VpgvT8T/0nqEoRVNuA8NhjO+LHR0gGTG9PLbWRjgzvOzu9rSHQrL8Er4eGqHLTp+F7l7OvgLIR6rVRUG3YP21/QYSQQoGQ/ec+nNsXtrqdUBvzIRxNI+jVJyVBStTbEoLSXyfqGi33q5MglTFXxizTLwmuHWfDjpVYsAPXgOfORKbflimWXXEXZycz+a5Tp6CJL07zC1IB1QYv4ivf/jhnhZyVFYM9x6jMKyvzne+PzEPws/t1D2UJ0WfMksiuiHtpuorTG22QBiL2jtEdKkMUsVfkg8oAxhdAC09/I7RX19kBrVfdc=
+              calgor@calgor-IdeaPad-5-15ITL05
+        Tags:
+          owner: "ahomayoni3@gmail.com"
+  ##########################################################################
+  #  EventBridge Schedules                                                 #
+  ##########################################################################
+    SFTPServerSetupScheduler:
+      Type: AWS::Events::Rule
+      Properties:
+        Name: "sftp-server-setup-scheduler"
+        Description: "Schedule to setup SFTP server"
+        ScheduleExpression: "cron(0 22 28 * ? *)"
+        State: "ENABLED"
+        Targets:
+          - Arn: !GetAtt SFTPServerSetup.Arn
+            Id: "sftp-server-setup-scheduler"
+        Tags:
+          - Key: owner
+            Value: "ahomayoni3@gmail.com"
+##########################################################################
+#  Outputs                                                               #
+##########################################################################
+Outputs:
+  LambdaFunctionArn:
+    Description: "ARN of the Lambda function"
+    Value: !GetAtt SFTPServerSetup.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-LambdaFunctionArn"
+
+  EventBridgeRuleArn:
+    Description: "ARN of the EventBridge Rule"
+    Value: !GetAtt SFTPServerSetupScheduler.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EventBridgeRuleArn"
+
+
+
+    
