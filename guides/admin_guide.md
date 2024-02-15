@@ -24,3 +24,18 @@ Ensure all user management tasks are completed before the scheduled cron job: `0
   aws dynamodb delete-item --table-name SFTPUsers --key '{"username": {"S": "employee_username"}}'
 ### Access Invoices and S3 Bucket Administration
 - Admins can access both S3 buckets(with administrative permissions) using an SFTP client with the admin username and private key. For configuration details, refer to the User Guide.
+### Deleting the SFTP Server after all of the invoices are uploaded
+- To delete the SFTP server after all invoices are uploaded, first, list the servers using the command:
+  ```bash
+  aws transfer list-servers
+  ```
+  Then, delete the server using the command:
+  ```bash
+  aws transfer delete-server --server-id server_id
+  ```
+  Replace `server_id` with the actual server ID from the previous command output.
+- Or you can login to the AWS console and delete the server from the AWS Transfer Family service page.
+![SFTP server deletion](images/admin-1.png "go to the sftp server page")
+![SFTP server deletion](images/admin-2.png "click on the server you want to delete and then click on the actions button")
+![SFTP server deletion](images/admin-3.png "confirm the deletion by typing delete")
+![SFTP server deletion](images/admin-4.png "go to the sftp server page to confirm the deletion")
