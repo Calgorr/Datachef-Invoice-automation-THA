@@ -22,9 +22,9 @@ This guide outlines the steps for employees to securely upload their monthly inv
 3. Connect to the server using your SSH key.
 4. Upload your invoice files, named in the `YYYYMM.pdf` format, during the last two days of each month after receiving upload instructions from the admin.
 ## Appendix: FileZilla Connection Example
-![FileZilla Connection Example](guides/images/user-1.png "File")
-![FileZilla Connection Example](guides/images/user-2.png "Making a new site named User2")
-![FileZilla Connection Example](guides/images/user-3.png "entering the server details")
-![FileZilla Connection Example](guides/images/user-4.png "connecting to the server")
-![FileZilla Connection Example](guides/images/user-5.png "browse the local files")
-![FileZilla Connection Example](guides/images/user-6.png "uploading the files")
+![FileZilla Connection Example](mages/user-1.png "File")
+![FileZilla Connection Example](images/user-2.png "Making a new site named User2")
+![FileZilla Connection Example](images/user-3.png "entering the server details")
+![FileZilla Connection Example](images/user-4.png "connecting to the server")
+![FileZilla Connection Example](images/user-5.png "browse the local files")
+![FileZilla Connection Example](images/user-6.png "uploading the files")
