@@ -19,7 +19,7 @@ This guide outlines the steps for employees to securely upload their monthly inv
 
 1. Use an SFTP client like Cyberduck or FileZilla.
 2. Enter the server details provided by the admin.
-3. Connect to the server using your private SSH key.
+3. Connect to the server using your private SSH key(if you are using filezila and the private key does not end in .pem or .ppk just add the suffix to your private key so filezila can find it).
 4. Upload your invoice files, named in the `YYYYMM.pdf` format, during the last two days of each month after receiving upload instructions from the admin.
 ## Appendix: FileZilla Connection Example
 ![FileZilla Connection Example](images/user-1.png "File")
