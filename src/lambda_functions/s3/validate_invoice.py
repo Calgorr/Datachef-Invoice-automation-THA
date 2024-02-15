@@ -2,7 +2,7 @@ import json
 import boto3
 import re
 from notify_slack import post_message_to_slack
-from config.config import DESTINATION_BUCKET_NAME
+from config.lambda_config import DESTINATION_BUCKET_NAME
 
 
 class S3ClientSingleton:
