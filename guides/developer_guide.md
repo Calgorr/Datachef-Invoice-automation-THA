@@ -12,7 +12,7 @@ Proposed Improvements
 1.  **SFTP Server ID Storage**: Store the SFTP server ID in a DynamoDB table for precise policy Resource Defining, avoiding the use of `Resource = *`(least privilege principle).
 2.  **Scheduled SFTP Server Management**: Implement a system to fetch the last SFTP server ID and schedule server deletion for the first day of each month, allowing a maximum lifespan of 2 days post-creation if not manually terminated by the admin.
 3.  **Lambda Function for User Addition**: Create a Lambda function to automatically add users stored in the DynamoDB table to the SFTP server upon its activation, using the server ID from the database.
-4.  **Lambda Function to delete the sftp server based on the number of uploads**: after each upload in a month a counter is incremented by one after the counter reaches the number of employee's the sftp server is deleted
+4.  **Lambda Function to delete the sftp server based on the number of uploads**: after each upload in a month a counter is incremented by one after the counter reaches the number of employee's existing in the SFTPUsers table the sftp server is deleted
 
 ### Additional Suggestion
 
