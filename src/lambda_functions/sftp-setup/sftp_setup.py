@@ -38,6 +38,20 @@ def create_sftp_server():
         raise e
 
 
+def store_server_in_dynamodb(server_id):
+    try:
+        dynamodb.put_item(
+            TableName=SERVERS_DYNAMODB_TABLE_NAME,
+            Item={
+                "serverId": {"S": server_id},
+                "status": {"S": "online"},
+            },
+        )
+    except Exception as e:
+        print(f"Error storing SFTP server info in DynamoDB: {e}")
+        raise e
+
+
 def create_sftp_user(server_id):
     try:
         transfer.create_user(
@@ -47,7 +61,6 @@ def create_sftp_user(server_id):
             SshPublicKeyBody=SSH_PUBLIC_KEY,
             HomeDirectory=ADMIN_HOME_DIRECTORY,
         )
-        print("SFTP user created successfully.")
     except Exception as e:
         print(f"Error creating SFTP user: {e}")
         raise e
@@ -55,7 +68,7 @@ def create_sftp_user(server_id):
 
 def get_users_from_dynamodb():
     try:
-        return dynamodb.scan(TableName=DYNAMODB_TABLE_NAME).get("Items", [])
+        return dynamodb.scan(TableName=USERS_DYNAMODB_TABLE_NAME).get("Items", [])
     except Exception as e:
         print(f"Error scanning DynamoDB table: {e}")
         raise e
@@ -81,7 +94,7 @@ def create_sftp_users(users, server_id):
 
 def lambda_handler(event, context):
     server_id = create_sftp_server()
-    print(f"SFTP Server created with ID: {server_id}")
+    store_server_in_dynamodb(server_id)
     create_sftp_user(server_id)
     users = get_users_from_dynamodb()
     create_sftp_users(users, server_id)
