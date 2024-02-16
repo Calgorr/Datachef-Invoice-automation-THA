@@ -29,7 +29,7 @@ Resources:
           - AttributeName: serverId
             KeyType: HASH
         AttributeDefinitions:
-          - AttributeName: Username
+          - AttributeName: serverId
             AttributeType: S
         BillingMode: PAY_PER_REQUEST
         TableName: SFTPServers
