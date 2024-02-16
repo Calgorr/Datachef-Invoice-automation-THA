@@ -385,9 +385,12 @@ Resources:
         Timeout: 3
         Environment:
           Variables:
-            dynamodb_table_name: SFTPUsers
-            home_directory: /dc-tha5-destination-bucket
-            iam_role_arn: arn:aws:iam::212435474521:role/sftp-admin-role
+            users_dynamodb_table_name: SFTPUsers
+            servers_dynamodb_table_name: SFTPServers
+            admin_home_directory: /dc-tha5-destination-bucket
+            employee_home_directory: /dc-tha5-source-bucket
+            admin_iam_role_arn: arn:aws:iam::212435474521:role/sftp-admin-role
+            employee_iam_role_arn: arn:aws:iam::212435474521:role/sftp-employee-s3-management-role
             owner_email_address: ahomayoni3@gmail.com
             # the ssh public key of the admin should be added here
         Tags:
