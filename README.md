@@ -76,9 +76,9 @@ Additional Efforts and Learnings
 --------------------------------
 In this project, my aim was not only to meet the essential requirements but also to explore and integrate practices that could enhance the robustness and security of the solution. I am continuously learning and were excited to incorporate some of my learnings into the project. Here’s a brief overview of what I've attempted to achieve:
 
-*   **Infrastructure as Code (IaC)**:  Utilizing AWS CloudFormation, I've adhered to the principles of IaC for the entire deployment of our project. This approach enables us to automate and replicate our infrastructure setup effortlessly, ensuring consistency and reducing manual errors. The `template.yaml` file in the deployment folder outlines the configurations for all AWS services involved.
-*   **Security and DevSecOps Mindset**: Security is at the core of our project design. I've ensured that all file transfers are encrypted, safeguarding the data in transit and at rest..
-*   **Least Privilege Principle**:  In line with best practices for access management, I've meticulously crafted IAM policies to adhere to the least privilege principle. This means that each component of our solution, from Lambda functions to SFTP server access, is granted only the permissions necessary to perform its intended functions.(But i could do better take a look at the developer guide)
+*   **Infrastructure as Code (IaC)**:  Utilizing AWS CloudFormation, I've adhered to the principles of IaC for the entire deployment of the project. This approach enables us to automate and replicate our infrastructure setup effortlessly, ensuring consistency and reducing manual errors. The `template.yaml` file in the deployment folder outlines the configurations for all AWS services involved.
+*   **Security and DevSecOps Mindset**: Security is at the core of the project design. I've ensured that all file transfers are encrypted, safeguarding the data in transit and at rest..
+*   **Least Privilege Principle**:  In line with best practices for access management, I've meticulously crafted IAM policies to adhere to the least privilege principle. This means that each component of the solution, from Lambda functions to SFTP server access, is granted only the permissions necessary to perform its intended functions.(But i could do better take a look at the developer guide)
 
 Configuration
 -------------
