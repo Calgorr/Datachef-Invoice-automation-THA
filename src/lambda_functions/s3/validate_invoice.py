@@ -14,8 +14,10 @@ class S3ClientSingleton:
         return cls._instance
 
 
+s3_client = S3ClientSingleton()
+
+
 def lambda_handler(event, context):
-    s3_client = S3ClientSingleton()
     username, source_bucket, file_key = extract_info_from_event(event)
     if not file_type_validated(file_key) or not file_name_validated(file_key[:-4]):
         slack_message = f"File {file_key} is not a valid invoice file."
