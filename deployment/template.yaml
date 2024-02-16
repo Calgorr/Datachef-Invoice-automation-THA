@@ -279,7 +279,7 @@ Resources:
         Environment:
           Variables:
             destination_bucket_name: "dc-tha5-destination-bucket"
-            slack_webhook_url: "https://hooks.slack.com/services/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"
+            # the slack webhook URL should be added here
             source_bucket_name: "dc-tha5-source-bucket"
         Tags:
           owner: "ahomayoni3@gmail.com"
@@ -301,10 +301,7 @@ Resources:
             home_directory: /dc-tha5-destination-bucket
             iam_role_arn: arn:aws:iam::212435474521:role/sftp-admin-role
             owner_email_address: ahomayoni3@gmail.com
-            ssh_public_key: >-
-              ssh-rsa
-              AAAAB3NzaC1yc2EAAAADAQABAAABgQDkBo/p2neDK6+Rl7vRP+qj/RCk0/VW40edokm79PNCSYSpAurHEMoGixBkTkGCKqr5GVSdrDzZd6t8Mm+N06WbG/s4q0O72N3K+KpgDKWN8zvZRQugpFb+BjBYqKe5ZSIXbOkUF5XoT8qjbFHawt8lqe88BKUqTTFpfTetJlDmTkW4OP074uRYPcOY2BvbJPu2AJeHUT4vq/Z7VpgvT8T/0nqEoRVNuA8NhjO+LHR0gGTG9PLbWRjgzvOzu9rSHQrL8Er4eGqHLTp+F7l7OvgLIR6rVRUG3YP21/QYSQQoGQ/ec+nNsXtrqdUBvzIRxNI+jVJyVBStTbEoLSXyfqGi33q5MglTFXxizTLwmuHWfDjpVYsAPXgOfORKbflimWXXEXZycz+a5Tp6CJL07zC1IB1QYv4ivf/jhnhZyVFYM9x6jMKyvzne+PzEPws/t1D2UJ0WfMksiuiHtpuorTG22QBiL2jtEdKkMUsVfkg8oAxhdAC09/I7RX19kBrVfdc=
-              calgor@calgor-IdeaPad-5-15ITL05
+            # the ssh public key of the admin should be added here
         Tags:
           owner: "ahomayoni3@gmail.com"
   ##########################################################################
