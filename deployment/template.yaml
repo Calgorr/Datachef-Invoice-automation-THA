@@ -456,7 +456,3 @@ Outputs:
     Value: !GetAtt SFTPServerSetupScheduler.Arn
     Export:
       Name: !Sub "${AWS::StackName}-EventBridgeRuleArn"
-
-
-
-    
