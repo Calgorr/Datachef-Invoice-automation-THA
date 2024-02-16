@@ -20,7 +20,7 @@ The system integrates AWS Transfer Family's SFTP service with AWS S3, using Lamb
 Proposed Improvements
 ---------------------
 
-1.  **SFTP Server ID Storage**: Store the SFTP server ID in a DynamoDB table for precise policy Resource Defining, avoiding the use of `Resource = *`(least privilege principle).
+1.  **SFTP Server ID Storage**: fetch the SFTP server ID from a DynamoDB table for precise policy Resource Defining, avoiding the use of `Resource = *`(least privilege principle).
 2.  **Lambda Function to delete the sftp server based on the number of uploads**: after each upload in a month a counter is incremented by one after the counter reaches the number of employee's existing in the SFTPUsers table the sftp server is deleted
 
 ### Additional Suggestion
