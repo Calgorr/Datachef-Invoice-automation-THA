@@ -33,6 +33,15 @@
                     "iam:PassedToService": "transfer.amazonaws.com"
                 }
             }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:PutItem"
+            ],
+            "Resource": "arn:aws:dynamodb:eu-west-1:212435474521:table/SFTPServers"
         }
     ]
 }
