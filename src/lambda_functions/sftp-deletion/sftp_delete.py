@@ -40,7 +40,7 @@ def update_server_status_in_dynamodb(server_id):
         dynamodb.update_item(
             TableName=SERVERS_DYNAMODB_TABLE_NAME,
             Key={"serverId": {"S": server_id}},
-            UpdateExpression="SET Status = :val",
+            UpdateExpression="SET status = :val",
             ExpressionAttributeValues={":val": {"S": "deleted"}},
         )
         print(f"SFTP Server {server_id} status updated to deleted in DynamoDB.")
