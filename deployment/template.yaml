@@ -6,9 +6,9 @@ Resources:
 ##########################################################################
 #  Dynamo DB tables                                                      #
 ##########################################################################
-    SFTPTable:
+    UsersSFTPTable:
       Type: "AWS::DynamoDB::Table"
-      DeletionPolicy: Delete
+      DeletionPolicy: Retain
       Properties:
         KeySchema:
           - AttributeName: Username
@@ -18,6 +18,21 @@ Resources:
             AttributeType: S
         BillingMode: PAY_PER_REQUEST
         TableName: SFTPUsers
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
+    ServersSFTPTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: serverId
+            KeyType: HASH
+        AttributeDefinitions:
+          - AttributeName: Username
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        TableName: SFTPServers
         Tags:
          - Key: owner
            Value: "ahomayoni3@gmail.com"
@@ -112,6 +127,58 @@ Resources:
         Tags:
          - Key: owner
            Value: "ahomayoni3@gmail.com"
+    SFTPServerDeleteionLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: sftp-delete-lambda-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "lambda.amazonaws.com"
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: s3-copy-lambda-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Sid: "Statement1"
+                  Effect: "Allow"
+                  Action:
+                  - "dynamodb:UpdateItem"
+                  - "dynamodb:Scan"
+                  Resource: "arn:aws:dynamodb:eu-west-1:212435474521:table/SFTPServers"
+                - Sid: "Statement2"
+                  Effect: "Allow"
+                  Action: "transfer:DeleteServer"
+                  Resource: "*"
+          - PolicyName: AWSXRayDaemonWriteAccess
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Sid: "AWSXRayDaemonWriteAccess"
+                  Effect: "Allow"
+                  Action:
+                    - "xray:PutTraceSegments"
+                    - "xray:PutTelemetryRecords"
+                    - "xray:GetSamplingRules"
+                    - "xray:GetSamplingTargets"
+                    - "xray:GetSamplingStatisticSummaries"
+                  Resource: "*"
+          - PolicyName: AWSLambdaBasicExecutionRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - "logs:CreateLogGroup"
+                    - "logs:CreateLogStream"
+                    - "logs:PutLogEvents"
+                  Resource: "*"
+        Tags:
+         - Key: owner
+           Value: "ahomayoni3@gmail.com"
     SFTPAdminRole:
       Type: AWS::IAM::Role
       Properties:
@@ -146,7 +213,7 @@ Resources:
         Tags:
          - Key: owner
            Value: "ahomayoni3@gmail.com"                    
-    EventBridgeSchedulerLambdaRole:
+    EventBridgeSchedulerSetupLambdaRole:
       Type: AWS::IAM::Role
       Properties:
         RoleName: Amazon_EventBridge_Scheduler_LAMBDA_5d93c3bca3
@@ -167,6 +234,27 @@ Resources:
                   Resource:
                     - "arn:aws:lambda:eu-west-1:212435474521:function:sftp-server-setup:*"
                     - "arn:aws:lambda:eu-west-1:212435474521:function:sftp-server-setup"
+    EventBridgeSchedulerDeletionLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: Amazon_EventBridge_Scheduler_LAMBDA_f890ee0ad5
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Principal:
+                Service: "scheduler.amazonaws.com"
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: Amazon-EventBridge-Scheduler-Execution-Policy-0cf20313-dae9-46fe-9456-129b609456b8
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: "Allow"
+                  Action: "lambda:InvokeFunction"
+                  Resource:
+                    - "arn:aws:lambda:eu-west-1:212435474521:function:sftp-delete-lambda:*"
+                    - "arn:aws:lambda:eu-west-1:212435474521:function:sftp-delete-lambda"
         Tags:
          - Key: owner
            Value: "ahomayoni3@gmail.com"
@@ -304,6 +392,23 @@ Resources:
             # the ssh public key of the admin should be added here
         Tags:
           owner: "ahomayoni3@gmail.com"
+    SFTPServerDeleteion:
+      Type: AWS::Lambda::Function
+      Properties:
+        FunctionName: "sftp-delete-lambda"
+        Handler: "lambda_function.lambda_handler"
+        Role: !GetAtt SFTPServerLambdaRole.Arn
+        Code:
+          S3Bucket: "dc-tha5-lambda-functions-code"
+          S3Key: "sftp-delete-lambda-ddfd6d5e-13f0-461e-9290-e83e11b70296.zip"
+        Runtime: python3.12
+        MemorySize: 128
+        Timeout: 3
+        Environment:
+          Variables:
+            servers_dynamodb_table_name: SFTPServers
+        Tags:
+          owner: "ahomayoni3@gmail.com"
   ##########################################################################
   #  EventBridge Schedules                                                 #
   ##########################################################################
@@ -317,6 +422,19 @@ Resources:
         Targets:
           - Arn: !GetAtt SFTPServerSetup.Arn
             Id: "sftp-server-setup-scheduler"
+        Tags:
+          - Key: owner
+            Value: "ahomayoni3@gmail.com"
+    SFTPServerDeletionScheduler:
+      Type: AWS::Events::Rule
+      Properties:
+        Name: "sftp-server-deletion-scheduler"
+        Description: "Schedule to setup SFTP server"
+        ScheduleExpression: "cron(0 10 1 * ? *)"
+        State: "ENABLED"
+        Targets:
+          - Arn: !GetAtt SFTPServerDeleteion.Arn
+            Id: "sftp-server-deletion-scheduler"
         Tags:
           - Key: owner
             Value: "ahomayoni3@gmail.com"
