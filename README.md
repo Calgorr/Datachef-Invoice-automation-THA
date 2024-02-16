@@ -46,10 +46,11 @@ Installation
 
 1.  **Create S3 Buckets**: Establish two S3 buckets for source and destination purposes.
 2.  **Setup SFTP Server**: Deploy an SFTP server via AWS Transfer Family linked to the source S3 bucket. Schedule the server to start operations two days before each month's end.
-3.  **Deploy Lambda Function**: Implement a Lambda function triggered by file uploads to the source bucket, facilitating file transfers to the destination bucket.
-4.  **Prepare DynamoDB Table**: Construct a DynamoDB table for storing user details and SSH keys.
-5.  **Configure SFTP Users**: Employ a Lambda function to integrate user details from the DynamoDB table into the SFTP server.
-6.  **Schedule SFTP Server Management**: Utilize an event-based system for SFTP server operational scheduling.
+3. **SFTP Server Deletion**: Schedule the deletion of the SFTP server at the first day of each month 10 Am.
+4.  **Deploy Lambda Function**: Implement a Lambda function triggered by file uploads to the source bucket, facilitating file transfers to the destination bucket.
+5.  **Prepare DynamoDB Table**: Construct a DynamoDB table for storing user details and SSH keys.
+6.  **Configure SFTP Users**: Employ a Lambda function to integrate user details from the DynamoDB table into the SFTP server.
+7.  **Schedule SFTP Server Management**: Utilize an event-based system for SFTP server operational scheduling.
 
 Usage
 -----
@@ -73,7 +74,7 @@ Features
 
 Additional Efforts and Learnings
 --------------------------------
-In this project, my aim was not only to meet the essential requirements but also to explore and integrate practices that could enhance the robustness and security of our solution. I am continuously learning and were excited to incorporate some of my learnings into the project. Here’s a brief overview of what I've attempted to achieve:
+In this project, my aim was not only to meet the essential requirements but also to explore and integrate practices that could enhance the robustness and security of tje solution. I am continuously learning and were excited to incorporate some of my learnings into the project. Here’s a brief overview of what I've attempted to achieve:
 
 *   **Infrastructure as Code (IaC)**:  Utilizing AWS CloudFormation, I've adhered to the principles of IaC for the entire deployment of our project. This approach enables us to automate and replicate our infrastructure setup effortlessly, ensuring consistency and reducing manual errors. The `template.yaml` file in the deployment folder outlines the configurations for all AWS services involved.
 *   **Security and DevSecOps Mindset**: Security is at the core of our project design. I've ensured that all file transfers are encrypted, safeguarding the data in transit and at rest..

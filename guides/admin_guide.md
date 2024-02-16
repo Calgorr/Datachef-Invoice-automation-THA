@@ -7,7 +7,7 @@
 
 ## User Management Commands
 
-Ensure all user management tasks are completed before the scheduled cron job: `0 22 28 * ? *`.
+Ensure all user management tasks are completed before the scheduled cron job: `0 22 28 * ? *`.( Otherwise the added employee do not have access to the source bucket and the deleted employee still has access to the bucket )
 
 ### Creating a User in DynamoDB
 
@@ -25,6 +25,7 @@ Ensure all user management tasks are completed before the scheduled cron job: `0
 ### Access Invoices and S3 Bucket Administration
 - Admins can access both S3 buckets(with administrative permissions) using an SFTP client with the admin username and private key. For configuration details, refer to the User Guide.
 ### Deleting the SFTP Server after all of the invoices are uploaded
+Keep in mind that the server would be eventually deleted after 36 hours so the employee's should have uploaded their invoices onto the soruce bucket before that.
 - To delete the SFTP server after all invoices are uploaded, first, list the servers using the command:
   ```bash
   aws transfer list-servers
