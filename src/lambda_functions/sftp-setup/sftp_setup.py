@@ -44,7 +44,7 @@ def store_server_in_dynamodb(server_id):
             TableName=SERVERS_DYNAMODB_TABLE_NAME,
             Item={
                 "serverId": {"S": server_id},
-                "status": {"S": "online"},
+                "sftpStatus": {"S": "online"},
             },
         )
     except Exception as e:

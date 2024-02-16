@@ -1,6 +1,6 @@
 import boto3
 import json
-from config.sftp_config import *
+from config.sftp_config import SERVERS_DYNAMODB_TABLE_NAME
 
 
 class TransferClientSingleton:
@@ -40,7 +40,7 @@ def update_server_status_in_dynamodb(server_id):
         dynamodb.update_item(
             TableName=SERVERS_DYNAMODB_TABLE_NAME,
             Key={"serverId": {"S": server_id}},
-            UpdateExpression="SET status = :val",
+            UpdateExpression="SET sftpStatus = :val",
             ExpressionAttributeValues={":val": {"S": "deleted"}},
         )
         print(f"SFTP Server {server_id} status updated to deleted in DynamoDB.")
@@ -53,7 +53,7 @@ def lambda_handler(event, context):
     try:
         response = dynamodb.scan(
             TableName=SERVERS_DYNAMODB_TABLE_NAME,
-            FilterExpression="status = :status",
+            FilterExpression="sftpStatus = :status",
             ExpressionAttributeValues={":status": {"S": "online"}},
         )
         servers = response.get("Items", [])
@@ -61,7 +61,7 @@ def lambda_handler(event, context):
         for server in servers:
             server_id = server["serverId"]["S"]
             if delete_sftp_server(server_id):
-                update_server_status_in_dynamodb(server_id, "deleted")
+                update_server_status_in_dynamodb(server_id)
 
         return {
             "statusCode": 200,
